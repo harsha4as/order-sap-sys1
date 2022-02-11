@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<error-handler name="error-handler" doc:id="fbe0380e-e9e2-471d-9231-b50909773ce0" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="17030e95-d834-460a-afa9-9e5cab44c555" type="ANY" >
+			<ee:transform doc:name="error.description" doc:id="a5372f5a-f03d-4398-8474-d5218508f990" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0output application/json
+---
+{	"errorCode": attributes.httpStatus,
+	"errorMessage": error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<set-variable value="#[attributes.httpStatus]" doc:name="Set HTTP Status Code" doc:id="7fe83d25-650f-4e2a-8244-f9ec91c3ea20" variableName="httpStatus" />
+		</on-error-propagate>
+	</error-handler>
+</mule>

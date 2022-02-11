@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="6655bc0c-6df6-4f95-95fa-f8d2f1d1f674" >
+		<http:listener-connection host="${api.host}" port="${http.port}" />
+	</http:listener-config>
+	<flow name="order-sap-sys1Flow" doc:id="4069273f-2dce-41c0-816e-f48372dfc524" >
+		<http:listener doc:name="Listener" doc:id="3686db77-8792-4eb9-b4f6-93daca6f61a0" path="/createOrder" config-ref="HTTP_Listener_config" allowedMethods="POST">
+			<http:response statusCode="#[vars.httpStatus default 200]" />
+			<http:error-response statusCode="#[vars.httpStatus default 500]">
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<ee:transform doc:name="sent for order creation" doc:id="719d72bc-34fa-4142-878b-f5e2e2191e4d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	result: "Order Created Successfully in SAP"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="order created successfully" doc:id="3af81b81-6c6d-447a-8ae3-a09a70453199" message="order created successfully"/>
+		<error-handler ref="error-handler" />
+	</flow>
+</mule>
